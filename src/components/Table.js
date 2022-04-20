@@ -16,45 +16,49 @@ const Td = styled.td``;
 const Btn = styled.button``;
 
 export const Tabled = () => {
-  const data = useSelector((store) => store.data);
+  const data = useSelector((store) => store);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   useEffect(() => {
     dispatch(fetchEmployeeDataSuccess(employees));
-  }, []);
-  return (
-    <Table>
-      <Thead>
-        <Tr>
-          <Th>Sr no.</Th>
-          <Th>full name</Th>
-          <Th>email</Th>
-          <Th>age</Th>
-          <Th>designation</Th>
+  }, [dispatch]);
 
-          <Th onClick={() => navigate("/edit")}>
-            <AiOutlineUserAdd />
-            Add
-          </Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {data.map((employee) => (
-          <Tr key={employee.id}>
-            <Td>{employee.id}</Td>
-            <Td>{employee.name}</Td>
-            <Td>{employee.email}</Td>
-            <Td>{employee.role}</Td>
-            <Td>{employee.age}</Td>
-            <Td>
-              <Btn onClick={() => navigate(`/edit/${employee.id}`)}>Edit</Btn>
-              <Btn onClick={() => navigate(`/delete/${employee.id}`)}>
-                Delete
-              </Btn>
-            </Td>
+  return (
+    <>
+      <h1>{data.data.length}</h1>
+      <Table>
+        <Thead>
+          <Tr>
+            <Th>Sr no.</Th>
+            <Th>full name</Th>
+            <Th>email</Th>
+            <Th>age</Th>
+            <Th>designation</Th>
+
+            <Th onClick={() => navigate("/edit")}>
+              <AiOutlineUserAdd />
+              Add
+            </Th>
           </Tr>
-        ))}
-      </Tbody>
-    </Table>
+        </Thead>
+        <Tbody>
+          {data.data.map((employee) => (
+            <Tr key={employee.id}>
+              <Td>{employee.id}</Td>
+              <Td>{employee.name}</Td>
+              <Td>{employee.email}</Td>
+              <Td>{employee.role}</Td>
+              <Td>{employee.age}</Td>
+              <Td>
+                <Btn onClick={() => navigate(`/edit/${employee.id}`)}>Edit</Btn>
+                <Btn onClick={() => navigate(`/delete/${employee.id}`)}>
+                  Delete
+                </Btn>
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+    </>
   );
 };
