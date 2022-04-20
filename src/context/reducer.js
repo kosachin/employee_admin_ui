@@ -5,6 +5,9 @@ import {
   ADD_EMPLOYEE_FAILURE,
   ADD_EMPLOYEE_REQUEST,
   ADD_EMPLOYEE_SUCCESS,
+  REMOVE_EMPLOYEE_SUCCESS,
+  RESET,
+  EDIT_EMP,
 } from "../context/actionTypes";
 
 const init = {
@@ -26,6 +29,16 @@ export const reducer = (store = init, { type, payload }) => {
       return { ...store, loading: false, data: [...store.data, payload] };
     case ADD_EMPLOYEE_FAILURE:
       return { ...store, loading: false, error: payload.message };
+    case REMOVE_EMPLOYEE_SUCCESS:
+      const filteredData = store.data.filter((emp) => emp.id !== payload);
+      return { ...store, data: filteredData };
+    // case EDIT_EMP:
+    //   // const info = store.map(e=>{if(e.id===payload.id){
+    //   //   return payload
+    //   // }
+    //   // return e)
+    case RESET:
+      return init;
     default:
       return store;
   }

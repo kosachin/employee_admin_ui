@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { addEmployeeSuccess } from "../context/actions";
+import { useNavigate, useParams } from "react-router-dom";
+import { addEmployeeSuccess, getEmployeeById } from "../context/actions";
 import { ReqFieldError } from "../utils/ReqFieldError";
 import stateWiseCities from "../utils/stateWiseCity";
 
@@ -19,29 +20,34 @@ const composeValidators =
       undefined
     );
 const setCity = (args, state, utils) => {
-  console.log(state);
   utils.changeValue(state, "cityDropDown", () => args[0]);
-  console.log(state.cityDropDown);
 };
 export const EditForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { id } = useParams();
+  // console.log(id);
   const store = useSelector((store) => store.data);
-  console.log(store);
   const onSubmit = (value) => {
-    console.log(value);
     const { name, email, age, role } = value;
     const payload = { name, email, age, role };
     dispatch(addEmployeeSuccess(payload));
     navigate(-1);
   };
+  let info;
+  // useEffect(() => {
+  //   info = store.find((e) => e.id === id);
+  //   // console.log({ ...info });
+  // }, []);
   return (
     <div>
+      <h4 onClick={() => navigate("/")}>Home</h4>
       <Form
         onSubmit={onSubmit}
         mutators={{ setCity }}
         initialValues={{
           cityDropDown: [],
+          ...info,
         }}
       >
         {({ handleSubmit, form, values }) => (
@@ -124,7 +130,6 @@ export const EditForm = () => {
                         name="state"
                         value={value}
                         onChange={(data) => {
-                          console.log(data);
                           onChange(data.target.value);
                           form.mutators.setCity(
                             stateWiseCities[data.target.value]
@@ -143,8 +148,16 @@ export const EditForm = () => {
                 </div>
                 <div>
                   <label>city:</label>
-                  <Field name="city" component={"select"} validate={required}>
-                    <option value={null}></option>
+                  <Field
+                    name="city"
+                    component={"select"}
+                    validate={required}
+                    style={{
+                      display:
+                        values.cityDropDown.length > 1 ? "block" : "none",
+                    }}
+                  >
+                    <option value={[]}></option>
                     {values.cityDropDown.map((e) => (
                       <option key={e.city} value={e.city}>
                         {e.city}
@@ -225,15 +238,3 @@ const MobileNumberField = ({ ...prop }) => (
     </Field>
   </div>
 );
-
-// const Address = ({ ...prop }) => (
-//   <div>
-//     <Field></Field>
-//   </div>
-// );
-
-function state(params) {
-  console.log(params);
-}
-
-state(["a", "v"]);

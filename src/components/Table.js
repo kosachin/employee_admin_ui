@@ -4,7 +4,12 @@ import { AiOutlineUserAdd } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchEmployeeDataSuccess } from "../context/actions";
+import {
+  removeEmployeeSuccess,
+  fetchEmployeeDataSuccess,
+  reset,
+} from "../context/actions";
+
 const Table = styled.table`
   //   background-color: red;
 `;
@@ -19,13 +24,12 @@ export const Tabled = () => {
   const data = useSelector((store) => store);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  useEffect(() => {
-    dispatch(fetchEmployeeDataSuccess(employees));
-  }, [dispatch]);
 
   return (
     <>
-      <h1>{data.data.length}</h1>
+      <div>
+        <button onClick={() => dispatch(reset())}>Reset</button>
+      </div>
       <Table>
         <Thead>
           <Tr>
@@ -42,21 +46,26 @@ export const Tabled = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {data.data.map((employee) => (
-            <Tr key={employee.id}>
-              <Td>{employee.id}</Td>
-              <Td>{employee.name}</Td>
-              <Td>{employee.email}</Td>
-              <Td>{employee.role}</Td>
-              <Td>{employee.age}</Td>
-              <Td>
-                <Btn onClick={() => navigate(`/edit/${employee.id}`)}>Edit</Btn>
-                <Btn onClick={() => navigate(`/delete/${employee.id}`)}>
-                  Delete
-                </Btn>
-              </Td>
-            </Tr>
-          ))}
+          {data?.data &&
+            data.data.map((employee) => (
+              <Tr key={employee.id}>
+                <Td>{employee.id}</Td>
+                <Td>{employee.name}</Td>
+                <Td>{employee.email}</Td>
+                <Td>{employee.role}</Td>
+                <Td>{employee.age}</Td>
+                <Td>
+                  <Btn onClick={() => navigate(`/edit/${employee.id}`)}>
+                    Edit
+                  </Btn>
+                  <Btn
+                    onClick={() => dispatch(removeEmployeeSuccess(employee.id))}
+                  >
+                    Delete
+                  </Btn>
+                </Td>
+              </Tr>
+            ))}
         </Tbody>
       </Table>
     </>
