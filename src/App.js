@@ -17,15 +17,9 @@ function App() {
     <div className="App">
       {/* <HomePage/> */}
       <Routes>
-        <Route index element={<HomePage />} />
-        <Route path={"/"}>
-          <Route path={"edit"} element={<EditPage />}>
-            <Route path=":id" element={<EditPage />} />
-          </Route>
-          <Route path={"delete/:id"} element={<DeletePage />}>
-            {/* <Route path=":id" element={<EditPage />} /> */}
-          </Route>
-        </Route>
+        <Route path={"/"} element={<HomePage />} />
+        <Route path="/edit" element={<EditPage />} />
+        <Route path="/edit/:id" element={<EditPage />} />
       </Routes>
     </div>
   );

@@ -25,6 +25,11 @@ export const Tabled = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const handleDelete = (id) => {
+    if (window.confirm("Do you really want to delete??")) {
+      dispatch(removeEmployeeSuccess(id));
+    }
+  };
   return (
     <>
       <div>
@@ -58,11 +63,7 @@ export const Tabled = () => {
                   <Btn onClick={() => navigate(`/edit/${employee.id}`)}>
                     Edit
                   </Btn>
-                  <Btn
-                    onClick={() => dispatch(removeEmployeeSuccess(employee.id))}
-                  >
-                    Delete
-                  </Btn>
+                  <Btn onClick={() => handleDelete(employee.id)}>Delete</Btn>
                 </Td>
               </Tr>
             ))}

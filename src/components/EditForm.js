@@ -1,17 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { addEmployeeSuccess, getEmployeeById } from "../context/actions";
+import { addEmployeeSuccess, editEmp } from "../context/actions";
 import { ReqFieldError } from "../utils/ReqFieldError";
 import stateWiseCities from "../utils/stateWiseCity";
 
 const required = (value) => (value ? undefined : "Required");
 const mustBeNumber = (value) => (isNaN(value) ? "Must be a number" : undefined);
 const minValue = (min) => (value) =>
-  isNaN(value) || value >= min ? undefined : `Should be greater than ${min}`;
+  isNaN(value) || value >= min ? undefined : `Should be greater than ${min} `;
 const lengthEquals = (len) => (value) =>
   len === value.length ? undefined : "Enter 10 digit phone number";
+const checkStartsWith = (value) =>
+  value.startsWith("0") ? "Should not start with 0" : undefined;
 const composeValidators =
   (...validators) =>
   (value) =>
@@ -22,23 +24,30 @@ const composeValidators =
 const setCity = (args, state, utils) => {
   utils.changeValue(state, "cityDropDown", () => args[0]);
 };
+
 export const EditForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { id } = useParams();
-  // console.log(id);
+  let { id } = useParams();
+  const [selected, setSelected] = useState(null);
   const store = useSelector((store) => store.data);
+  useEffect(() => {
+    setSelected(store.find((e) => Number(e.id) === Number(id)));
+  }, [id]);
+
   const onSubmit = (value) => {
-    const { name, email, age, role } = value;
-    const payload = { name, email, age, role };
-    dispatch(addEmployeeSuccess(payload));
+    if (id) {
+      const { name, email, age, role, id } = value;
+      const payload = { name, email, age, role, id };
+      dispatch(editEmp(value));
+    } else {
+      const { name, email, age, role } = value;
+      const payload = { name, email, age, role, id: store.length + 1 };
+      dispatch(addEmployeeSuccess(payload));
+    }
     navigate(-1);
   };
-  let info;
-  // useEffect(() => {
-  //   info = store.find((e) => e.id === id);
-  //   // console.log({ ...info });
-  // }, []);
+
   return (
     <div>
       <h4 onClick={() => navigate("/")}>Home</h4>
@@ -47,10 +56,10 @@ export const EditForm = () => {
         mutators={{ setCity }}
         initialValues={{
           cityDropDown: [],
-          ...info,
+          ...selected,
         }}
       >
-        {({ handleSubmit, form, values }) => (
+        {({ handleSubmit, form, values, submitting, pristine }) => (
           <form onSubmit={handleSubmit}>
             <div>
               <label>Full name:</label>
@@ -76,6 +85,22 @@ export const EditForm = () => {
               />
             </div>
             <div>
+              <label>DOB:</label>
+              <Field
+                name="dob"
+                component={"input"}
+                type={"date"}
+                validate={required}
+              >
+                {({ input, meta }) => (
+                  <>
+                    <input {...input} />
+                    {meta.error && meta.touched && <span>{meta.error}</span>}
+                  </>
+                )}
+              </Field>
+            </div>
+            <div>
               <label>Age:</label>
               <AgeField
                 name="age"
@@ -90,14 +115,10 @@ export const EditForm = () => {
             <div>
               <label>Mobile Number: </label>
               <MobileNumberField
-                type="number"
+                // type="number"
                 name="pnum"
                 placeholder="Enter your mobile number"
-                validate={composeValidators(
-                  required,
-                  mustBeNumber,
-                  lengthEquals(10)
-                )}
+                validate={(required, mustBeNumber, lengthEquals(10))}
                 component="input"
               />
             </div>
@@ -223,10 +244,14 @@ const AgeField = ({ ...prop }) => (
 const MobileNumberField = ({ ...prop }) => (
   <div>
     <Field
-      type="number"
       name="pnum"
       placeholder="Enter your mobile number"
-      validate={composeValidators(required, mustBeNumber, lengthEquals(10))}
+      validate={composeValidators(
+        required,
+        mustBeNumber,
+        checkStartsWith,
+        lengthEquals(10)
+      )}
       component="input"
     >
       {({ input, meta, placeholder }) => (
