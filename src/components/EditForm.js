@@ -3,9 +3,13 @@ import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { addEmployeeSuccess, editEmp } from "../context/actions";
-import { ReqFieldError } from "../utils/ReqFieldError";
+// import { ReqFieldError } from "../utils/ReqFieldError";
 import stateWiseCities from "../utils/stateWiseCity";
-
+import { TextField } from "../Form/textField";
+import { RoleField } from "../Form/roleField";
+import { AgeField } from "../Form/ageField";
+import { MobileNumberField } from "../Form/mobileField";
+import { DOBField } from "../Form/dobField";
 const required = (value) => (value ? undefined : "Required");
 const mustBeNumber = (value) => (isNaN(value) ? "Must be a number" : undefined);
 const minValue = (min) => (value) =>
@@ -37,12 +41,11 @@ export const EditForm = () => {
 
   const onSubmit = (value) => {
     if (id) {
-      const { name, email, age, role, id } = value;
-      const payload = { name, email, age, role, id };
+      // const { name, email, age, role, id } = value;
+      // const payload = { name, email, age, role, id };
       dispatch(editEmp(value));
     } else {
-      const { name, email, age, role } = value;
-      const payload = { name, email, age, role, id: store.length + 1 };
+      const payload = { id: store.length + 1, ...value };
       dispatch(addEmployeeSuccess(payload));
     }
     navigate(-1);
@@ -86,7 +89,13 @@ export const EditForm = () => {
             </div>
             <div>
               <label>DOB:</label>
-              <Field
+              <DOBField
+                name="dob"
+                component={"input"}
+                type={"date"}
+                validate={required}
+              />
+              {/* <Field
                 name="dob"
                 component={"input"}
                 type={"date"}
@@ -98,7 +107,7 @@ export const EditForm = () => {
                     {meta.error && meta.touched && <span>{meta.error}</span>}
                   </>
                 )}
-              </Field>
+              </Field> */}
             </div>
             <div>
               <label>Age:</label>
@@ -115,7 +124,6 @@ export const EditForm = () => {
             <div>
               <label>Mobile Number: </label>
               <MobileNumberField
-                // type="number"
                 name="pnum"
                 placeholder="Enter your mobile number"
                 validate={(required, mustBeNumber, lengthEquals(10))}
@@ -196,70 +204,71 @@ export const EditForm = () => {
     </div>
   );
 };
-const TextField = ({ ...prop }) => (
-  <Field {...prop}>
-    {({ input, meta }) => (
-      <>
-        <input {...input} />
-        {meta.error && meta.touched && <ReqFieldError />}
-      </>
-    )}
-  </Field>
-);
-const RoleField = ({ options, ...prop }) => {
-  return (
-    <div>
-      {options.map((value) => (
-        <>
-          <label>{value}</label>
-          <Field {...prop} value={value}>
-            {({ input, meta }) => (
-              <>
-                <input {...input} />
-              </>
-            )}
-          </Field>
-        </>
-      ))}
-    </div>
-  );
-};
-const AgeField = ({ ...prop }) => (
-  <div>
-    <Field
-      name="age"
-      placeholder="Enter your age"
-      validate={composeValidators(required, mustBeNumber, minValue(18))}
-    >
-      {({ input, meta, placeholder }) => (
-        <div>
-          <input {...input} placeholder={placeholder} />
-          {meta.error && meta.touched && <span> {meta.error}</span>}
-        </div>
-      )}
-    </Field>
-  </div>
-);
 
-const MobileNumberField = ({ ...prop }) => (
-  <div>
-    <Field
-      name="pnum"
-      placeholder="Enter your mobile number"
-      validate={composeValidators(
-        required,
-        mustBeNumber,
-        checkStartsWith,
-        lengthEquals(10)
-      )}
-      component="input"
-    >
-      {({ input, meta, placeholder }) => (
-        <div>
-          <input {...input} placeholder={placeholder} />
-          {meta.error && meta.touched && <span> {meta.error}</span>}
-        </div>
-      )}
-    </Field>
-  </div>
-);
+// const TextField = ({ ...prop }) => (
+//   <Field {...prop}>
+//     {({ input, meta }) => (
+//       <>
+//         <input {...input} />
+//         {meta.error && meta.touched && <ReqFieldError />}
+//       </>
+//     )}
+//   </Field>
+// );
+// const RoleField = ({ options, ...prop }) => {
+//   return (
+//     <div>
+//       {options.map((value) => (
+//         <>
+//           <label>{value}</label>
+//           <Field {...prop} value={value}>
+//             {({ input, meta }) => (
+//               <>
+//                 <input {...input} />
+//               </>
+//             )}
+//           </Field>
+//         </>
+//       ))}
+//     </div>
+//   );
+// };
+// const AgeField = ({ ...prop }) => (
+//   <div>
+//     <Field
+//       name="age"
+//       placeholder="Enter your age"
+//       validate={composeValidators(required, mustBeNumber, minValue(18))}
+//     >
+//       {({ input, meta, placeholder }) => (
+//         <div>
+//           <input {...input} placeholder={placeholder} />
+//           {meta.error && meta.touched && <span> {meta.error}</span>}
+//         </div>
+//       )}
+//     </Field>
+//   </div>
+// );
+
+// const MobileNumberField = ({ ...prop }) => (
+//   <div>
+//     <Field
+//       name="pnum"
+//       placeholder="Enter your mobile number"
+//       validate={composeValidators(
+//         required,
+//         mustBeNumber,
+//         checkStartsWith,
+//         lengthEquals(10)
+//       )}
+//       component="input"
+//     >
+//       {({ input, meta, placeholder }) => (
+//         <div>
+//           <input {...input} placeholder={placeholder} />
+//           {meta.error && meta.touched && <span> {meta.error}</span>}
+//         </div>
+//       )}
+//     </Field>
+//   </div>
+// );
