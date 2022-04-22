@@ -57,8 +57,8 @@ export const Tabled = () => {
                 <Td>{employee.id}</Td>
                 <Td>{employee.name}</Td>
                 <Td>{employee.email}</Td>
-                <Td>{employee.role}</Td>
                 <Td>{employee.age}</Td>
+                <Td>{employee.role}</Td>
                 <Td>
                   <Btn onClick={() => navigate(`/edit/${employee.id}`)}>
                     Edit

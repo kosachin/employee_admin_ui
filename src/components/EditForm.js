@@ -10,6 +10,7 @@ import { RoleField } from "../Form/roleField";
 import { AgeField } from "../Form/ageField";
 import { MobileNumberField } from "../Form/mobileField";
 import { DOBField } from "../Form/dobField";
+import { compose, withHandlers, withState } from "recompose";
 const required = (value) => (value ? undefined : "Required");
 const mustBeNumber = (value) => (isNaN(value) ? "Must be a number" : undefined);
 const minValue = (min) => (value) =>
@@ -29,20 +30,19 @@ const setCity = (args, state, utils) => {
   utils.changeValue(state, "cityDropDown", () => args[0]);
 };
 
-export const EditForm = () => {
+const EditForm = ({ selected, handleAddEmp }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   let { id } = useParams();
-  const [selected, setSelected] = useState(null);
+  // const [selected, setSelected] = useState(null);
   const store = useSelector((store) => store.data);
   useEffect(() => {
-    setSelected(store.find((e) => Number(e.id) === Number(id)));
+    handleAddEmp(store, id);
+    // setSelected(store.find((e) => Number(e.id) === Number(id)));
   }, [id]);
 
   const onSubmit = (value) => {
     if (id) {
-      // const { name, email, age, role, id } = value;
-      // const payload = { name, email, age, role, id };
       dispatch(editEmp(value));
     } else {
       const payload = { id: store.length + 1, ...value };
@@ -62,7 +62,7 @@ export const EditForm = () => {
           ...selected,
         }}
       >
-        {({ handleSubmit, form, values, submitting, pristine }) => (
+        {({ handleSubmit, form, values, submitting, pristine, valid }) => (
           <form onSubmit={handleSubmit}>
             <div>
               <label>Full name:</label>
@@ -94,6 +94,7 @@ export const EditForm = () => {
                 component={"input"}
                 type={"date"}
                 validate={required}
+                disabled={id ? true : false}
               />
               {/* <Field
                 name="dob"
@@ -196,7 +197,9 @@ export const EditForm = () => {
                 </div>
               </div>
             </div>
-            <button type="submit">Submit</button>
+            <button type="submit" disabled={!valid}>
+              Submit
+            </button>
             <pre>{JSON.stringify(values)}</pre>
           </form>
         )}
@@ -272,3 +275,13 @@ export const EditForm = () => {
 //     </Field>
 //   </div>
 // );
+const enhance = compose(
+  withState("selected", "setSelected", null),
+  withHandlers({
+    handleAddEmp:
+      ({ setSelected }) =>
+      (store, id) =>
+        setSelected(store.find((e) => Number(e.id) === Number(id))),
+  })
+);
+export default enhance(EditForm);

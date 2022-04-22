@@ -1,4 +1,4 @@
-import { EditForm } from "../components/EditForm";
+import EditForm from "../components/EditForm";
 
 export const EditPageLayout = () => {
   return (

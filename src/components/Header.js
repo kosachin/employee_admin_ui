@@ -1,4 +1,3 @@
-import employees from "../utils/tempData";
 import { Tabled } from "./Table";
 
 export const Header = () => {

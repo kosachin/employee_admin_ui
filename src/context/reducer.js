@@ -31,7 +31,7 @@ export const reducer = (store = init, { type, payload }) => {
     case ADD_EMPLOYEE_FAILURE:
       return { ...store, loading: false, error: payload.message };
     case REMOVE_EMPLOYEE_SUCCESS:
-      const filteredData = store.data.filter((emp) => emp.id !== payload);
+      const filteredData = store.data.filter((emp) => 0);
       return { ...store, data: filteredData };
     case EDIT_EMP:
       // console.log("edit emp data", payload);
