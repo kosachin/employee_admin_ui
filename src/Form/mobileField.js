@@ -27,7 +27,7 @@ export const MobileNumberField = ({ ...prop }) => (
     >
       {({ input, meta, placeholder }) => (
         <div>
-          <input {...input} placeholder={placeholder} maxlength="10" />
+          <input {...input} placeholder={placeholder} maxLength="10" />
           {meta.error && meta.touched && <span> {meta.error}</span>}
         </div>
       )}

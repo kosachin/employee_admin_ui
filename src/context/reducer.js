@@ -14,13 +14,14 @@ const init = {
   loading: false,
   error: "",
   data: [],
+  total: 0,
 };
 export const reducer = (store = init, { type, payload }) => {
   switch (type) {
     case FETCH_EMPLOYEE_DATA_REQUEST:
       return { ...store, loading: true };
     case FETCH_EMPLOYEE_DATA_SUCCESS:
-      return { ...store, loading: false, data: payload };
+      return { ...store, loading: false, data: payload, total: payload.length };
     case FETCH_EMPLOYEE_DATA_FAILURE:
       return { ...store, loading: false, error: payload.message };
     case ADD_EMPLOYEE_REQUEST:
@@ -31,7 +32,7 @@ export const reducer = (store = init, { type, payload }) => {
     case ADD_EMPLOYEE_FAILURE:
       return { ...store, loading: false, error: payload.message };
     case REMOVE_EMPLOYEE_SUCCESS:
-      const filteredData = store.data.filter((emp) => 0);
+      const filteredData = store.data.filter((emp) => emp.id !== payload);
       return { ...store, data: filteredData };
     case EDIT_EMP:
       // console.log("edit emp data", payload);
