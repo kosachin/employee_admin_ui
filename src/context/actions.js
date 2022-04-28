@@ -11,6 +11,7 @@ import {
   RESET,
   GET_EMPLOYEE_BY_ID,
   EDIT_EMP,
+  SET_PAGE_DATA,
 } from "../context/actionTypes";
 
 export const fetchEmployeeDataRequest = () => ({
@@ -61,6 +62,11 @@ export const reset = () => ({
 
 export const getEmployeeById = (payload) => ({
   type: GET_EMPLOYEE_BY_ID,
+  payload,
+});
+
+export const setPageData = (payload) => ({
+  type: SET_PAGE_DATA,
   payload,
 });
 

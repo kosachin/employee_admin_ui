@@ -48,6 +48,11 @@ const EditForm = ({ selected, handleAddEmp }) => {
       const payload = { id: store.length + 1, ...value };
       dispatch(addEmployeeSuccess(payload));
     }
+    // navigate(-1);
+    let data = JSON.parse(localStorage.getItem("employees")) || [];
+    data.push(value);
+    console.log(data);
+    localStorage.setItem("employees", JSON.stringify(data));
     navigate(-1);
   };
 

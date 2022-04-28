@@ -1,14 +1,9 @@
 import styled from "styled-components";
-import employees from "../utils/tempData";
 import { AiOutlineUserAdd } from "react-icons/ai";
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  removeEmployeeSuccess,
-  fetchEmployeeDataSuccess,
-  reset,
-} from "../context/actions";
+import { removeEmployeeSuccess, reset, setPageData } from "../context/actions";
 
 const Table = styled.table`
   //   background-color: red;
@@ -22,18 +17,38 @@ const Btn = styled.button``;
 
 export const Tabled = () => {
   const data = useSelector((store) => store);
-  const [num, setNum] = useState(data.data.length);
+  // const [num, setNum] = useState(data.data.length);
   const [disable, setDisable] = useState(0);
-  console.log(num);
+  // console.log(num);
   const [page, setPage] = useState(0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleDelete = (id) => {
     if (window.confirm("Do you really want to delete??")) {
-      dispatch(removeEmployeeSuccess(id));
+      let allData = JSON.parse(localStorage.getItem("employees"));
+      let res = allData.filter((e) => e.id !== id);
+      localStorage.setItem("employees", JSON.stringify(res));
+      const newData = JSON.parse(localStorage.getItem("employees"));
+      console.log(newData.slice(data.meta.currStart, data.meta.limit));
+      dispatch(
+        removeEmployeeSuccess(
+          newData.slice(data.meta.currStart, data.meta.limit)
+        )
+      );
     }
   };
+  const handelNextPageData = () => {
+    setDisable(page + 1);
+    dispatch(setPageData(page + 1));
+    // dispatch(setPageData())
+    if (page !== data.meta.total / 20 - 1) {
+      return setPage((prev) => prev + 1);
+    } else {
+      return null;
+    }
+  };
+  console.log(data);
   return (
     <>
       <div>
@@ -56,7 +71,7 @@ export const Tabled = () => {
         </Thead>
         <Tbody>
           {data?.data &&
-            data.data.slice(20 * page, 20 + 20 * page).map((employee) => (
+            data.data.map((employee) => (
               <Tr key={employee.id}>
                 <Td>{employee.id}</Td>
                 <Td>{employee.name}</Td>
@@ -80,33 +95,29 @@ export const Tabled = () => {
             setDisable(page - 1);
             setPage((prev) => prev - 1);
           }}
-          // disabled={disable===i}
         >
           Prev
         </button>
-        {new Array(data.total / 20).fill(0).map((e, i) => (
-          <button
-            onClick={() => {
-              setPage(i);
-              setDisable(i);
-            }}
-            disabled={disable === i}
-          >
-            {i + 1}
-          </button>
-        ))}
+        {new Array(Math.ceil(data.meta.total / data.meta.limit))
+          .fill(0)
+          .map((e, i) => (
+            <button
+              onClick={() => {
+                dispatch(setPageData(i));
+                setPage(i);
+                setDisable(i);
+              }}
+              disabled={disable === i}
+            >
+              {i + 1}
+            </button>
+          ))}
         <button
-          style={{ display: page !== data.total / 20 - 1 ? "block" : "none" }}
-          onClick={() => {
-            setDisable(page + 1);
-            if (page !== data.total / 20 - 1) {
-              return setPage((prev) => prev + 1);
-            } else {
-              return null;
-            }
-            // page !== data.total / 20 - 1 ? setPage((prev) => prev + 1) : null;
+          style={{
+            display:
+              page !== Math.ceil(data.meta.total / 20) - 1 ? "block" : "none",
           }}
-          // disabled={disa}
+          onClick={handelNextPageData}
         >
           Next
         </button>

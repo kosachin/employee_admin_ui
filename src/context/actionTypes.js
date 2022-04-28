@@ -13,4 +13,6 @@ export const REMOVE_EMPLOYEE_FAILURE = "REMOVE_EMPLOYEE_FAILURE";
 export const RESET = "RESET";
 export const GET_EMPLOYEE_BY_ID = "GET_EMPLOYEE_BY_ID";
 
+export const SET_PAGE_DATA = "SET_PAGE_DATA";
+
 export const EDIT_EMP = "EDIT_EMP";
