@@ -14,5 +14,6 @@ export const RESET = "RESET";
 export const GET_EMPLOYEE_BY_ID = "GET_EMPLOYEE_BY_ID";
 
 export const SET_PAGE_DATA = "SET_PAGE_DATA";
+export const SET_PAGE_INFO_DATA = "SET_PAGE_INFO_DATA";
 
 export const EDIT_EMP = "EDIT_EMP";

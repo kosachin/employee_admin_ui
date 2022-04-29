@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { addEmployeeSuccess, editEmp } from "../context/actions";
+import {
+  addEmployeeSuccess,
+  editEmp,
+  fetchEmployeeDataSuccess,
+} from "../context/actions";
 // import { ReqFieldError } from "../utils/ReqFieldError";
 import stateWiseCities from "../utils/stateWiseCity";
 import { TextField } from "../Form/textField";
@@ -11,6 +15,11 @@ import { AgeField } from "../Form/ageField";
 import { MobileNumberField } from "../Form/mobileField";
 import { DOBField } from "../Form/dobField";
 import { compose, withHandlers, withState } from "recompose";
+import {
+  localStorageDataSize,
+  updateLocalStorage,
+} from "../utils/setLocalStorage";
+
 const required = (value) => (value ? undefined : "Required");
 const mustBeNumber = (value) => (isNaN(value) ? "Must be a number" : undefined);
 const minValue = (min) => (value) =>
@@ -42,17 +51,24 @@ const EditForm = ({ selected, handleAddEmp }) => {
   }, [id]);
 
   const onSubmit = (value) => {
-    if (id) {
-      dispatch(editEmp(value));
-    } else {
-      const payload = { id: store.length + 1, ...value };
-      dispatch(addEmployeeSuccess(payload));
-    }
-    // navigate(-1);
+    let payload;
     let data = JSON.parse(localStorage.getItem("employees")) || [];
-    data.push(value);
-    console.log(data);
+    if (id) {
+      const { address, age, city, dob, email, id, name, role, state } = value;
+      payload = { address, age, city, dob, email, id, name, role, state };
+      data = updateLocalStorage(data, payload, id);
+      // dispatch(editEmp(value));
+    } else {
+      payload = { id: localStorageDataSize() + 1, ...value };
+      data.push(payload);
+      // dispatch(addEmployeeSuccess(payload));
+    }
     localStorage.setItem("employees", JSON.stringify(data));
+    dispatch(
+      fetchEmployeeDataSuccess(
+        JSON.parse(localStorage.getItem("employees")).slice(0, 20)
+      )
+    );
     navigate(-1);
   };
 

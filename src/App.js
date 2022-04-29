@@ -16,6 +16,7 @@ function App() {
   // useEffect(() => {
   //   dispatch(fetchEmployeeDataSuccess(employees));
   // }, []);
+
   return (
     <div className="App">
       {/* <HomePage/> */}
@@ -31,19 +32,27 @@ const enhance = compose(
   connect(
     (store) => ({
       totalEmployeesCount: store.meta.total,
+      currStart: store.meta.currStart,
+      limit: store.meta.limit,
     }),
     (dispatch) => ({
-      handleFetchOnLoad: (employees) =>
-        dispatch(fetchEmployeeDataSuccess(employees)),
+      handleFetchOnLoad: ({ employees, currStart }) =>
+        dispatch(fetchEmployeeDataSuccess({ employees, currStart })),
     })
   ),
   lifecycle({
     componentDidMount() {
-      setLocalStorage(tempData);
-      this.props.handleFetchOnLoad(
-        JSON.parse(localStorage.getItem("employees")).slice(0, 20) ||
-          tempData.slice(0, 20)
-      );
+      setLocalStorage(tempData, this.props.currStart, this.props.limit);
+      this.props.handleFetchOnLoad({
+        employees:
+          JSON.parse(localStorage.getItem("employees")).slice(
+            // this.props.currStart ||
+            JSON.parse(localStorage.getItem("pageInfo")).start,
+            // this.props.currStart + this.props.limit ||
+            JSON.parse(localStorage.getItem("pageInfo")).limit
+          ) || tempData.slice(0, 20),
+        currStart: JSON.parse(localStorage.getItem("pageInfo")).start,
+      });
     },
   })
 );

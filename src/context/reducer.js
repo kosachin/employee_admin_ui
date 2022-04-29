@@ -9,6 +9,7 @@ import {
   RESET,
   EDIT_EMP,
   SET_PAGE_DATA,
+  SET_PAGE_INFO_DATA,
 } from "../context/actionTypes";
 
 const init = {
@@ -27,20 +28,20 @@ export const reducer = (store = init, { type, payload }) => {
     case FETCH_EMPLOYEE_DATA_REQUEST:
       return { ...store, loading: true };
     case FETCH_EMPLOYEE_DATA_SUCCESS:
-      console.log("here");
       return {
         ...store,
         loading: false,
-        data: payload,
+        data: payload.employees,
         meta: {
           ...store.meta,
+          currStart: payload.currStart,
           total: JSON.parse(localStorage.getItem("employees")).length,
         },
       };
     case FETCH_EMPLOYEE_DATA_FAILURE:
       return { ...store, loading: false, error: payload.message };
     case ADD_EMPLOYEE_REQUEST:
-    // return { ...store, loading: true,data: };
+      return { ...store, loading: true };
     case ADD_EMPLOYEE_SUCCESS:
     // localStorage.setItem(
     //   "employees",
@@ -50,7 +51,6 @@ export const reducer = (store = init, { type, payload }) => {
     case ADD_EMPLOYEE_FAILURE:
       return { ...store, loading: false, error: payload.message };
     case REMOVE_EMPLOYEE_SUCCESS:
-      console.log(payload);
       // const filteredData = store.data.filter((emp) => emp.id !== payload);
       return { ...store, data: payload };
     case EDIT_EMP:
@@ -65,23 +65,20 @@ export const reducer = (store = init, { type, payload }) => {
       return { ...store, data: info };
 
     case SET_PAGE_DATA:
-      console.log(JSON.parse(localStorage.getItem("employees")));
-      console.log({
-        ...store,
-        data: JSON.parse(localStorage.getItem("employees")),
-        meta: {
-          ...store.meta,
-          currStart: store.meta.limit * payload,
-        },
-      });
       return {
         ...store,
-        data: store.data.slice(40, 60),
+        data: payload.data,
         meta: {
           ...store.meta,
-          currStart: store.meta.limit * payload,
+          currStart: payload.currStart,
         },
       };
+    case SET_PAGE_INFO_DATA:
+      return {
+        ...store,
+        meta: { ...store.meta, currStart: payload },
+      };
+
     case RESET:
       return init;
 

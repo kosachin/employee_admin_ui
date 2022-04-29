@@ -74,3 +74,8 @@ export const editEmp = (payload) => ({
   type: EDIT_EMP,
   payload,
 });
+
+export const setPageInfoData = (payload) => ({
+  type: SET_PAGE_DATA,
+  payload,
+});
