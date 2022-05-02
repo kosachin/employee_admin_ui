@@ -15,11 +15,10 @@ export const paginatedData = (page, limit) => {
     "employees",
     JSON.stringify({
       data: prevData,
-      pageInfo: { page: page, limit },
+      pageInfo: { page: page + 1, limit },
     })
   );
   return {
-    currStart: limit * page,
     data: JSON.parse(localStorage.getItem("employees")).data.slice(
       page * limit,
       page * limit + limit
@@ -34,9 +33,17 @@ export const updateLocalStorage = (localStorageData, payload, id) => {
     }
     return e;
   });
-  console.log(updatedLocalStorageData);
   return updatedLocalStorageData;
 };
 
+export const deleteFromLocalStorage = (id) => {
+  const allData = JSON.parse(localStorage.getItem("employees")).data;
+  const res = allData.filter((e) => e.id !== id);
+  localStorage.setItem(
+    "employees",
+    JSON.stringify({ data: res, pageInfo: allData.pageInfo })
+  );
+};
+
 export const localStorageDataSize = () =>
-  JSON.parse(localStorage.getItem("employees")).length;
+  JSON.parse(localStorage.getItem("employees")).data.length;

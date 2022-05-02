@@ -4,7 +4,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { removeEmployeeSuccess, reset, setPageData } from "../context/actions";
-import { paginatedData } from "../utils/setLocalStorage";
+import {
+  deleteFromLocalStorage,
+  paginatedData,
+} from "../utils/setLocalStorage";
 
 const Table = styled.table`
   //   background-color: red;
@@ -20,76 +23,56 @@ const PaginatedNumberedButtons = ({
   data,
   dispatch,
   setPage,
-  setDisable,
-  disable,
+  page,
   size,
   handlePageQuerry,
 }) => {
   return (
-    <>
+    <div>
       {size.fill(0).map((e, i) => (
         <button
           onClick={() => {
-            setDisable(i);
             setPage(i);
             handlePageQuerry(i);
             dispatch(setPageData(paginatedData(i, data.meta.limit)));
           }}
-          disabled={disable === i}
+          disabled={page === i}
         >
           {i + 1}
         </button>
       ))}
-    </>
+    </div>
   );
 };
 
 export const Tabled = () => {
-  const data = useSelector((store) => store);
-  console.log(data);
   let [searchParams, setSearchParams] = useSearchParams();
-  const [disable, setDisable] = useState(+searchParams.get("pg") - 1);
+  const data = useSelector((store) => store);
+  console.log("data", data);
   const [page, setPage] = useState(+searchParams.get("pg") - 1);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   useEffect(() => {
     dispatch(setPageData(paginatedData(page, data.meta.limit)));
-  }, []);
+  }, [page]);
   const handlePageQuerry = (page) => {
     setSearchParams({ pg: page + 1 });
   };
 
   const handleDelete = (id) => {
     if (window.confirm("Do you really want to delete??")) {
-      let allData = JSON.parse(localStorage.getItem("employees"));
-      let res = allData.data.filter((e) => e.id !== id);
-      console.log(res);
-      localStorage.setItem(
-        "employees",
-        JSON.stringify({ data: res, pageInfo: allData.pageInfo })
-      );
-      const newData = JSON.parse(localStorage.getItem("employees"));
-
-      dispatch(
-        removeEmployeeSuccess(
-          newData.slice(
-            data.meta.currStart,
-            data.meta.currStart + data.meta.limit
-          )
-        )
-      );
+      deleteFromLocalStorage(id);
+      dispatch(removeEmployeeSuccess(paginatedData(page, data.meta.limit)));
     }
   };
   const handelNextPageData = () => {
-    setDisable(page + 1);
-    setPage((prev) => prev + 1);
     handlePageQuerry(page + 1);
+    setPage((prev) => prev + 1);
     dispatch(setPageData(paginatedData(page + 1, data.meta.limit)));
   };
   const handelPrevPageData = () => {
-    setDisable(page - 1);
-    setPage((prev) => prev - 1);
     handlePageQuerry(page - 1);
+    setPage((prev) => prev - 1);
     dispatch(setPageData(paginatedData(page - 1, data.meta.limit)));
   };
 
@@ -114,7 +97,8 @@ export const Tabled = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {data?.data &&
+          {
+            // data?.data &&
             data.data.map((employee) => (
               <Tr key={employee.id}>
                 <Td>{employee.id}</Td>
@@ -129,7 +113,8 @@ export const Tabled = () => {
                   <Btn onClick={() => handleDelete(employee.id)}>Delete</Btn>
                 </Td>
               </Tr>
-            ))}
+            ))
+          }
         </Tbody>
       </Table>
       <div style={{ display: "flex", gap: "20px" }}>
@@ -143,17 +128,17 @@ export const Tabled = () => {
           data={data}
           page={page}
           setPage={setPage}
-          disable={disable}
           dispatch={dispatch}
           setPageData={setPageData}
-          setDisable={setDisable}
           size={new Array(Math.ceil(data.meta.total / data.meta.limit))}
           handlePageQuerry={handlePageQuerry}
         />
         <button
           style={{
             display:
-              page !== Math.ceil(data.meta.total / 20) - 1 ? "block" : "none",
+              page !== Math.ceil(data.meta.total / data.meta.limit) - 1
+                ? "block"
+                : "none",
           }}
           onClick={handelNextPageData}
         >
@@ -163,20 +148,3 @@ export const Tabled = () => {
     </>
   );
 };
-
-{
-  /* {new Array(Math.ceil(data.meta.total / data.meta.limit))
-  .fill(0)
-  .map((e, i) => (
-    <button
-      onClick={() => {
-        dispatch(setPageData(i));
-        setPage(i);
-        setDisable(i);
-      }}
-      disabled={disable === i}
-    >
-      {i + 1}
-    </button>
-  ))} */
-}

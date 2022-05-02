@@ -35,8 +35,7 @@ const enhance = compose(
       limit: store.meta.limit,
     }),
     (dispatch) => ({
-      handleFetchOnLoad: ({ employees, currStart }) =>
-        dispatch(fetchEmployeeDataSuccess({ employees, currStart })),
+      handleFetchOnLoad: (size) => dispatch(fetchEmployeeDataSuccess(size)),
     })
   ),
   lifecycle({
@@ -44,13 +43,7 @@ const enhance = compose(
       setLocalStorage(tempData);
       const { handleFetchOnLoad } = this.props;
       const lsData = JSON.parse(localStorage.getItem("employees"));
-      handleFetchOnLoad({
-        employees: lsData.data.slice(
-          lsData.pageInfo.limit * lsData.pageInfo.page,
-          lsData.pageInfo.limit * lsData.pageInfo.page + lsData.pageInfo.limit
-        ),
-        currStart: JSON.parse(localStorage.getItem("employees")).pageInfo.start,
-      });
+      handleFetchOnLoad(lsData.data.length);
     },
   })
 );

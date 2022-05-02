@@ -11,6 +11,7 @@ import {
   SET_PAGE_DATA,
   SET_PAGE_INFO_DATA,
 } from "../context/actionTypes";
+import { localStorageDataSize } from "../utils/setLocalStorage";
 
 const init = {
   loading: false,
@@ -18,8 +19,6 @@ const init = {
   data: [],
   meta: {
     total: 0,
-    start: 0,
-    currStart: 0,
     limit: 20,
   },
 };
@@ -31,11 +30,9 @@ export const reducer = (store = init, { type, payload }) => {
       return {
         ...store,
         loading: false,
-        data: payload.employees,
         meta: {
           ...store.meta,
-          currStart: payload.currStart,
-          total: JSON.parse(localStorage.getItem("employees")).data.length,
+          total: payload,
         },
       };
     case FETCH_EMPLOYEE_DATA_FAILURE:
@@ -43,16 +40,19 @@ export const reducer = (store = init, { type, payload }) => {
     case ADD_EMPLOYEE_REQUEST:
       return { ...store, loading: true };
     case ADD_EMPLOYEE_SUCCESS:
-    // localStorage.setItem(
-    //   "employees",
-    //   JSON.stringify([...store.data, payload])
-    // );
-    // return { ...store, loading: false, data: [...store.data, payload] };
+      console.log("here in ");
+      return {
+        ...store,
+        meta: { ...store.meta, total: localStorageDataSize() },
+      };
     case ADD_EMPLOYEE_FAILURE:
       return { ...store, loading: false, error: payload.message };
     case REMOVE_EMPLOYEE_SUCCESS:
-      // const filteredData = store.data.filter((emp) => emp.id !== payload);
-      return { ...store, data: payload };
+      return {
+        ...store,
+        data: payload.data,
+        meta: { ...store.meta, total: localStorageDataSize() },
+      };
     case EDIT_EMP:
       // console.log("edit emp data", payload);
       const info = store.data.map((e) => {
@@ -69,15 +69,8 @@ export const reducer = (store = init, { type, payload }) => {
         data: payload.data,
         meta: {
           ...store.meta,
-          currStart: payload.currStart,
         },
       };
-    case SET_PAGE_INFO_DATA:
-      return {
-        ...store,
-        meta: { ...store.meta, currStart: payload },
-      };
-
     case RESET:
       return init;
 

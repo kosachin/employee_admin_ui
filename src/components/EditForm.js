@@ -52,26 +52,41 @@ const EditForm = ({ selected, handleAddEmp }) => {
 
   const onSubmit = (value) => {
     let payload;
-    let data = JSON.parse(localStorage.getItem("employees")) || [];
+    let data = JSON.parse(localStorage.getItem("employees"));
+    let newData = JSON.parse(localStorage.getItem("employees")).data;
+
+    const { address, age, city, dob, email, id, name, role, state, pnum } =
+      value;
     if (id) {
-      const { address, age, city, dob, email, id, name, role, state, pnum } =
-        value;
       payload = { address, age, city, dob, email, id, name, role, state, pnum };
-      data = updateLocalStorage(data, payload, id);
+      newData = updateLocalStorage(data.data, payload, id);
       // dispatch(editEmp(value));
     } else {
-      payload = { id: localStorageDataSize() + 1, ...value };
-      data.push(payload);
-      // dispatch(addEmployeeSuccess(payload));
+      payload = {
+        id: localStorageDataSize() + 1,
+        address,
+        age,
+        city,
+        dob,
+        email,
+        name,
+        role,
+        state,
+        pnum,
+      };
+      newData.push(payload);
+      dispatch(addEmployeeSuccess());
     }
-    console.log(data);
-    localStorage.setItem("employees", JSON.stringify(data));
-
-    dispatch(
-      fetchEmployeeDataSuccess(
-        JSON.parse(localStorage.getItem("employees")).slice(80, 100)
-      )
+    localStorage.setItem(
+      "employees",
+      JSON.stringify({ data: newData, pageInfo: data.pageInfo })
     );
+
+    // dispatch(
+    //   fetchEmployeeDataSuccess(
+    //     JSON.parse(localStorage.getItem("employees")).slice(80, 100)
+    //   )
+    // );
     navigate(-1);
   };
 
