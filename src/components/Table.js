@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { AiOutlineUserAdd } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { removeEmployeeSuccess, reset, setPageData } from "../context/actions";
 import { paginatedData } from "../utils/setLocalStorage";
@@ -23,7 +23,7 @@ const PaginatedNumberedButtons = ({
   setDisable,
   disable,
   size,
-  page,
+  handlePageQuerry,
 }) => {
   return (
     <>
@@ -32,11 +32,8 @@ const PaginatedNumberedButtons = ({
           onClick={() => {
             setDisable(i);
             setPage(i);
-            dispatch(
-              setPageData(
-                paginatedData(i, data.meta.currStart, data.meta.limit)
-              )
-            );
+            handlePageQuerry(i);
+            dispatch(setPageData(paginatedData(i, data.meta.limit)));
           }}
           disabled={disable === i}
         >
@@ -46,19 +43,31 @@ const PaginatedNumberedButtons = ({
     </>
   );
 };
+
 export const Tabled = () => {
   const data = useSelector((store) => store);
-
-  const [disable, setDisable] = useState(0);
-  const [page, setPage] = useState(0);
+  console.log(data);
+  let [searchParams, setSearchParams] = useSearchParams();
+  const [disable, setDisable] = useState(+searchParams.get("pg") - 1);
+  const [page, setPage] = useState(+searchParams.get("pg") - 1);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  useEffect(() => {
+    dispatch(setPageData(paginatedData(page, data.meta.limit)));
+  }, []);
+  const handlePageQuerry = (page) => {
+    setSearchParams({ pg: page + 1 });
+  };
 
   const handleDelete = (id) => {
     if (window.confirm("Do you really want to delete??")) {
       let allData = JSON.parse(localStorage.getItem("employees"));
-      let res = allData.filter((e) => e.id !== id);
-      localStorage.setItem("employees", JSON.stringify(res));
+      let res = allData.data.filter((e) => e.id !== id);
+      console.log(res);
+      localStorage.setItem(
+        "employees",
+        JSON.stringify({ data: res, pageInfo: allData.pageInfo })
+      );
       const newData = JSON.parse(localStorage.getItem("employees"));
 
       dispatch(
@@ -74,16 +83,14 @@ export const Tabled = () => {
   const handelNextPageData = () => {
     setDisable(page + 1);
     setPage((prev) => prev + 1);
-    dispatch(
-      setPageData(paginatedData(page + 1, data.meta.currStart, data.meta.limit))
-    );
+    handlePageQuerry(page + 1);
+    dispatch(setPageData(paginatedData(page + 1, data.meta.limit)));
   };
   const handelPrevPageData = () => {
     setDisable(page - 1);
     setPage((prev) => prev - 1);
-    dispatch(
-      setPageData(paginatedData(page - 1, data.meta.currStart, data.meta.limit))
-    );
+    handlePageQuerry(page - 1);
+    dispatch(setPageData(paginatedData(page - 1, data.meta.limit)));
   };
 
   return (
@@ -141,6 +148,7 @@ export const Tabled = () => {
           setPageData={setPageData}
           setDisable={setDisable}
           size={new Array(Math.ceil(data.meta.total / data.meta.limit))}
+          handlePageQuerry={handlePageQuerry}
         />
         <button
           style={{

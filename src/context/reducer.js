@@ -35,7 +35,7 @@ export const reducer = (store = init, { type, payload }) => {
         meta: {
           ...store.meta,
           currStart: payload.currStart,
-          total: JSON.parse(localStorage.getItem("employees")).length,
+          total: JSON.parse(localStorage.getItem("employees")).data.length,
         },
       };
     case FETCH_EMPLOYEE_DATA_FAILURE:
@@ -61,7 +61,6 @@ export const reducer = (store = init, { type, payload }) => {
         }
         return e;
       });
-      // console.log(info);
       return { ...store, data: info };
 
     case SET_PAGE_DATA:

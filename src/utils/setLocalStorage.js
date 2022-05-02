@@ -1,37 +1,26 @@
-// import tempData from "./tempData";
-export const setLocalStorage = (tempData, currStart, limit) => {
-  if (!localStorage.getItem("employees") && !localStorage.getItem("pageInfo")) {
-    localStorage.setItem("employees", JSON.stringify(tempData));
+export const setLocalStorage = (tempData) => {
+  if (!localStorage.getItem("employees")) {
     localStorage.setItem(
-      "pageInfo",
-      JSON.stringify({ start: currStart, limit: limit })
+      "employees",
+      JSON.stringify({
+        data: tempData,
+        pageInfo: { page: 1, limit: 20 },
+      })
     );
   }
-  const info = JSON.parse(localStorage.getItem("pageInfo"));
-  // updatePageInfo(info);
 };
-// export function* paginatedData(page, currStart, limit) {
-//   while (true) {
-//     yield {
-//       currStart: limit * page,
-//       data: JSON.parse(localStorage.getItem("employees")).slice(
-//         currStart + limit,
-//         currStart + 2 * limit
-//       ),
-//     };
-//   }
-// }
-export const paginatedData = (page, currStart, limit) => {
+export const paginatedData = (page, limit) => {
+  const prevData = JSON.parse(localStorage.getItem("employees")).data;
   localStorage.setItem(
-    "pageInfo",
+    "employees",
     JSON.stringify({
-      start: limit * page,
-      limit: limit * page + limit,
+      data: prevData,
+      pageInfo: { page: page, limit },
     })
   );
   return {
     currStart: limit * page,
-    data: JSON.parse(localStorage.getItem("employees")).slice(
+    data: JSON.parse(localStorage.getItem("employees")).data.slice(
       page * limit,
       page * limit + limit
     ),
@@ -45,12 +34,9 @@ export const updateLocalStorage = (localStorageData, payload, id) => {
     }
     return e;
   });
+  console.log(updatedLocalStorageData);
   return updatedLocalStorageData;
 };
-
-// export const updatePageInfo = (info) => {
-//   const pageInfo = JSON.parse(localStorage.getItem("pageInfo"));
-// };
 
 export const localStorageDataSize = () =>
   JSON.parse(localStorage.getItem("employees")).length;

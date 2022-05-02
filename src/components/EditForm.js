@@ -54,8 +54,9 @@ const EditForm = ({ selected, handleAddEmp }) => {
     let payload;
     let data = JSON.parse(localStorage.getItem("employees")) || [];
     if (id) {
-      const { address, age, city, dob, email, id, name, role, state } = value;
-      payload = { address, age, city, dob, email, id, name, role, state };
+      const { address, age, city, dob, email, id, name, role, state, pnum } =
+        value;
+      payload = { address, age, city, dob, email, id, name, role, state, pnum };
       data = updateLocalStorage(data, payload, id);
       // dispatch(editEmp(value));
     } else {
@@ -63,10 +64,12 @@ const EditForm = ({ selected, handleAddEmp }) => {
       data.push(payload);
       // dispatch(addEmployeeSuccess(payload));
     }
+    console.log(data);
     localStorage.setItem("employees", JSON.stringify(data));
+
     dispatch(
       fetchEmployeeDataSuccess(
-        JSON.parse(localStorage.getItem("employees")).slice(0, 20)
+        JSON.parse(localStorage.getItem("employees")).slice(80, 100)
       )
     );
     navigate(-1);

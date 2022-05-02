@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { connect, useDispatch } from "react-redux";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import { DeletePage } from "./pages/deletepage";
+// import { DeletePage } from "./pages/deletepage";
 import { EditPage } from "./pages/editpage";
 import { HomePage } from "./pages/homepage";
 import { fetchEmployeeDataSuccess } from "./context/actions";
-import employees from "../src/utils/tempData";
+// import employees from "../src/utils/tempData";
 import { compose, lifecycle } from "recompose";
 import { setLocalStorage } from "./utils/setLocalStorage";
 import tempData from "../src/utils/tempData";
@@ -19,9 +19,8 @@ function App() {
 
   return (
     <div className="App">
-      {/* <HomePage/> */}
       <Routes>
-        <Route path={"/"} element={<HomePage />} />
+        <Route path={"/employees"} element={<HomePage />} />
         <Route path="/edit" element={<EditPage />} />
         <Route path="/edit/:id" element={<EditPage />} />
       </Routes>
@@ -42,16 +41,15 @@ const enhance = compose(
   ),
   lifecycle({
     componentDidMount() {
-      setLocalStorage(tempData, this.props.currStart, this.props.limit);
-      this.props.handleFetchOnLoad({
-        employees:
-          JSON.parse(localStorage.getItem("employees")).slice(
-            // this.props.currStart ||
-            JSON.parse(localStorage.getItem("pageInfo")).start,
-            // this.props.currStart + this.props.limit ||
-            JSON.parse(localStorage.getItem("pageInfo")).limit
-          ) || tempData.slice(0, 20),
-        currStart: JSON.parse(localStorage.getItem("pageInfo")).start,
+      setLocalStorage(tempData);
+      const { handleFetchOnLoad } = this.props;
+      const lsData = JSON.parse(localStorage.getItem("employees"));
+      handleFetchOnLoad({
+        employees: lsData.data.slice(
+          lsData.pageInfo.limit * lsData.pageInfo.page,
+          lsData.pageInfo.limit * lsData.pageInfo.page + lsData.pageInfo.limit
+        ),
+        currStart: JSON.parse(localStorage.getItem("employees")).pageInfo.start,
       });
     },
   })
